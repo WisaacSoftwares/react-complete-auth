@@ -23,13 +23,19 @@ export default function UpdateProfile() {
   function handlePrevSubmit(e) {
     e.preventDefault();
 
+    setError('');
+    setMessage('');
+
     if (passwordRef.current.value !== passwordCorfirmRef.current.value) {
       return setError('Passwords do not match');
     }
 
+    if (emailRef.current.value === currentUser.email
+      && !passwordRef.current.value) {
+      return setError('There is no changes in this form');
+    }
+
     setShowModal(true);
-    setError('');
-    setMessage('');
     // oldPassword.current
   }
 
@@ -44,28 +50,30 @@ export default function UpdateProfile() {
     }
     if (passwordRef.current.value) {
       promises.push(updatePassword(currentUser.email, oldPassword.current.value, passwordRef.current.value));
-      console.log(currentUser.email, oldPassword.current.value, passwordRef.current.value);
     }
 
     if (promises.length === 0) {
       setLoading(false);
       setShowModal(false);
 
-      return setError('There is no changes in the form');
+      return setError('There is no changes to update in the form');
     }
 
     Promise.all(promises)
       .then(() => {
         setMessage('Success: profile updated!');
+        emailRef.current.value = currentUser.email;
+        passwordRef.current.value = '';
+        passwordCorfirmRef.current.value = '';
         // navigate('/');
       })
       .catch((e) => {
         if (e.message === 'same-password') {
           setError('New password needs to be diferent than the old password');
         } else if (e.message === 'credentials-error') {
-          if(emailRef.current.value !== currentUser.email){
+          if (emailRef.current.value !== currentUser.email) {
             setError('Credentials Error (last password) or Email already in use');
-          } else{
+          } else {
             setError('Credentials Error, please check your last saved password');
           }
         } else {
@@ -87,15 +95,15 @@ export default function UpdateProfile() {
           {message && <Alert variant="success">{message}</Alert>}
           <Form onSubmit={handlePrevSubmit}>
             <Form.Group id="email">
-              <Form.Label>Email</Form.Label>
-              <Form.Control type="email" ref={emailRef} required defaultValue={currentUser.email}></Form.Control>
+              <Form.Label>New Email</Form.Label>
+              <Form.Control type="email" ref={emailRef} autoFocus required defaultValue={currentUser.email}></Form.Control>
             </Form.Group>
             <Form.Group id="password">
-              <Form.Label>Password</Form.Label>
+              <Form.Label>New Password</Form.Label>
               <Form.Control type="password" ref={passwordRef} placeholder='Leave blank to keep the same'></Form.Control>
             </Form.Group>
             <Form.Group id="password-corfirm">
-              <Form.Label>Password Confirmation</Form.Label>
+              <Form.Label>New Password Confirmation</Form.Label>
               <Form.Control type="password" ref={passwordCorfirmRef} placeholder='Leave blank to keep the same'></Form.Control>
             </Form.Group>
             <Button className='w-100 mt-3' type="submit">

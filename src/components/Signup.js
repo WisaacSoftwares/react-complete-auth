@@ -43,7 +43,7 @@ export default function Signup() {
           <Form onSubmit={handleSubmit}>
             <Form.Group id="email">
               <Form.Label>Email</Form.Label>
-              <Form.Control type="email" ref={emailRef} required></Form.Control>
+              <Form.Control type="email" ref={emailRef} autoFocus required></Form.Control>
             </Form.Group>
             <Form.Group id="password">
               <Form.Label>Password</Form.Label>
